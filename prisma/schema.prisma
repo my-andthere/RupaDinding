@@ -1,0 +1,318 @@
+// Prisma schema - PT Mitra Dinding Utama / RupaDinding
+// Dual engine: e-commerce ritel cat tekstur (KBLI 47521) + custom quotation jasa aplikator (KBLI 43303)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Core
+// ---------------------------------------------------------------------------
+
+model AdminUser {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  name         String
+  role         String    @default("admin")
+  isActive     Boolean   @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+/// Key-value store for seluruh konfigurasi situs (identitas, kanal, promo, dsb)
+model Setting {
+  key       String   @id
+  value     String
+  group     String   @default("Umum")
+  label     String?
+  type      String   @default("text") // text | textarea | number | boolean | url | image | color
+  hint      String?
+  isPublic  Boolean  @default(true)
+  updatedAt DateTime @updatedAt
+}
+
+// ---------------------------------------------------------------------------
+// Katalog produk (e-commerce ritel)
+// ---------------------------------------------------------------------------
+
+model Product {
+  id               String   @id @default(cuid())
+  sku              String   @unique
+  name             String
+  slug             String   @unique
+  category         String // Kamprot, Pasir/Sandtex, Silica/Stone, Kulit Jeruk, Popcorn, Batu Alam, Plaster Gosok/Stucco, Metalik, Mozaik
+  textureLevel     String // Rustic | Medium | Smooth
+  tagline          String   @default("")
+  description      String   @default("")
+  baseMaterial     String   @default("")
+  features         String   @default("[]") // JSON array
+  applicationAreas String   @default("[]") // JSON array
+  coverageRate     Float // m2/kg
+  image            String?
+  imageAlt         String?
+  isActive         Boolean  @default(true)
+  isFeatured       Boolean  @default(false)
+  sortOrder        Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  variants         ProductVariant[]
+}
+
+model ProductVariant {
+  id              String   @id @default(cuid())
+  productId       String
+  product         Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  label           String // contoh: Pail 25 kg
+  sizeKg          Float // 1 | 5 | 25
+  price           Int // harga jual dasar (IDR)
+  compareAtPrice  Int? // harga coret
+  stock           Int      @default(0)
+  sku             String?
+  isActive        Boolean  @default(true)
+  sortOrder       Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  cartItems       CartItem[]
+  orderItems      OrderItem[]
+  hppRecords      HppRecord[]
+  promos          Promo[]
+
+  @@unique([productId, sizeKg])
+}
+
+/// Harga coret / flash sale / promo berkala (11.11, 12.12, dst)
+model Promo {
+  id            String    @id @default(cuid())
+  name          String
+  type          String    @default("percent") // percent | fixed
+  value         Int       @default(0)
+  variantId     String?
+  variant       ProductVariant? @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  productId     String?
+  startDate     DateTime
+  endDate       DateTime
+  freeShipping  Boolean   @default(false)
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+}
+
+// ---------------------------------------------------------------------------
+// Modul jasa aplikator (custom quotation)
+// ---------------------------------------------------------------------------
+
+/// Tarif borongan tenaga & paket bahan+tenaga
+model ServiceRate {
+  id          String  @id @default(cuid())
+  category    String // tenaga | paket
+  name        String
+  motif       String
+  minPrice    Int
+  maxPrice    Int
+  description String  @default("")
+  negotiable  Boolean @default(true)
+  isActive    Boolean @default(true)
+  sortOrder   Int     @default(0)
+}
+
+/// Enam variabel penentu harga final (KBLI 43303)
+model ServiceFactor {
+  id          String  @id @default(cuid())
+  title       String
+  description String
+  icon        String  @default("info")
+  sortOrder   Int     @default(0)
+  isActive    Boolean @default(true)
+}
+
+/// Cakupan area pekerjaan (interior, eksterior, plafon, permukaan khusus)
+model ServiceScope {
+  id          String  @id @default(cuid())
+  name        String
+  description String  @default("")
+  icon        String  @default("paint")
+  sortOrder   Int     @default(0)
+  isActive    Boolean @default(true)
+}
+
+// ---------------------------------------------------------------------------
+// Transaksi
+// ---------------------------------------------------------------------------
+
+model Cart {
+  id        String     @id @default(cuid())
+  token     String     @unique
+  items     CartItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model CartItem {
+  id        String         @id @default(cuid())
+  cartId    String
+  cart      Cart           @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  variantId String
+  variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  qty       Int            @default(1)
+  createdAt DateTime       @default(now())
+
+  @@unique([cartId, variantId])
+}
+
+/// Pesanan produk (ritel) - pencatatan terpisah dari pendapatan jasa
+model Order {
+  id             String      @id @default(cuid())
+  orderNo        String      @unique
+  customerName   String
+  phone          String
+  email          String
+  address        String
+  city           String
+  note           String?
+  subtotal       Int
+  shippingCost   Int         @default(0)
+  discount       Int         @default(0)
+  total          Int
+  paymentMethod  String      @default("transfer")
+  paymentStatus  String      @default("belum_bayar") // belum_bayar | dp | lunas | gagal
+  status         String      @default("baru") // baru | diproses | dikirim | selesai | dibatalkan
+  items          OrderItem[]
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id          String          @id @default(cuid())
+  orderId     String
+  order       Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  variantId   String?
+  variant     ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+  productName String
+  variantLabel String
+  price       Int
+  qty         Int
+  total       Int
+}
+
+/// Prospek / Project Brief Generator -> WhatsApp
+model Lead {
+  id               String   @id @default(cuid())
+  name             String
+  company          String?
+  phone            String
+  email            String?
+  packageType      String   @default("paket") // tenaga | bundling
+  textureType      String?
+  areaSize         Float?
+  surfaceCondition String?
+  city             String?
+  notes            String?
+  source           String   @default("website")
+  variantLabel     String?
+  status           String   @default("baru") // baru |等服务 | survei | closing | batal
+  createdAt        DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// Konten non-transaksional
+// ---------------------------------------------------------------------------
+
+model GalleryItem {
+  id          String   @id @default(cuid())
+  title       String
+  motif       String
+  category    String
+  location    String?
+  projectType String?
+  areaSize    Float?
+  description String   @default("")
+  beforeImage String?
+  afterImage  String?
+  image       String?
+  isFeatured  Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+}
+
+model BlogPost {
+  id                String    @id @default(cuid())
+  title             String
+  slug              String    @unique
+  excerpt           String    @default("")
+  content           String    @default("")
+  coverImage        String?
+  tags              String    @default("")
+  status            String    @default("draft") // draft | published
+  author            String    @default("Tim RupaDinding")
+  relatedProductIds String    @default("[]") // JSON array of product ids
+  views             Int       @default(0)
+  publishedAt       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+
+/// Varian landing page untuk A/B testing
+model LandingVariant {
+  id              String   @id @default(cuid())
+  name            String
+  slug            String   @unique
+  isActive        Boolean  @default(true)
+  trafficWeight   Int      @default(50)
+  headline        String
+  subheadline     String
+  ctaText         String   @default("Beli Cat Tekstur")
+  secondaryCtaText String  @default("Konsultasi Jasa Aplikator")
+  bundlePrice     String   @default("")
+  promoText       String   @default("")
+  views           Int      @default(0)
+  clicks          Int      @default(0)
+  conversions     Int      @default(0)
+  createdAt       DateTime @default(now())
+}
+
+/// Catatan evaluasi HPP bulanan + simulasi beban kanal digital
+model HppRecord {
+  id                    String          @id @default(cuid())
+  variantId             String?
+  variant               ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+  productName           String
+  // HPP per unit dihitung dari komponen biaya private label (lihat rumus di dashboard admin)
+  supplierCost          Int             @default(0)
+  shippingCost          Int             @default(0)
+  packagingCost         Int             @default(0)
+  laborCost             Int             @default(0)
+  overhead              Int             @default(0)
+  unitsPerBatch         Int             @default(1)
+  marginTarget          Float           @default(0.25)
+  marketplaceCommission Float           @default(0)
+  adAllocation          Float           @default(0)
+  shippingSubsidy       Int             @default(0)
+  notes                 String?
+  createdAt             DateTime        @default(now())
+
+  @@index([createdAt])
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String?
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}

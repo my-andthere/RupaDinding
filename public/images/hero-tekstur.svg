@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <defs>
+    <filter id="t-hero" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="4" seed="7" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="26" xChannelSelector="R" yChannelSelector="G"/>
+      <feColorMatrix in="noise" type="saturate" values="0" result="gray"/>
+      <feBlend in="SourceGraphic" in2="gray" mode="multiply"/>
+    </filter>
+    <linearGradient id="g-hero" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#d9cdbb"/>
+      <stop offset="100%" stop-color="#b9835a"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#g-hero)"/>
+  <rect width="800" height="600" filter="url(#t-hero)" opacity="0.38"/>
+  <rect x="0" y="430" width="800" height="170" fill="#1d1c19" opacity="0.12"/>
+  <g opacity="0.25" stroke="#ffffff" stroke-width="2" fill="none">
+    <path d="M0 470 H800"/>
+    <path d="M0 520 H800"/>
+  </g>
+</svg>

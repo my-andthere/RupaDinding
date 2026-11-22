@@ -1,0 +1,42 @@
+{
+  "name": "rupadinding",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Website resmi PT Mitra Dinding Utama (RupaDinding) - e-commerce cat tekstur + layanan aplikator cat dengan CMS portal.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "prisma generate && next build",
+    "start": "next start",
+    "lint": "next lint",
+    "db:push": "prisma db push",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:reset": "prisma db push --force-reset && npm run db:seed",
+    "db:studio": "prisma studio",
+    "setup": "prisma generate && prisma db push && npm run db:seed"
+  },
+  "dependencies": {
+    "@prisma/client": "6.19.0",
+    "bcryptjs": "3.0.3",
+    "jose": "6.2.18",
+    "next": "16.4.6",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "server-only": "^0.0.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.3.5",
+    "@types/node": "24.10.1",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.4",
+    "prisma": "6.19.0",
+    "tailwindcss": "4.3.5",
+    "tsx": "4.20.6",
+    "typescript": "5.9.3"
+  },
+  "allowScripts": {
+    "prisma@6.19.0": true,
+    "@prisma/client@6.19.0": true,
+    "@prisma/engines@6.19.0": true,
+    "esbuild@0.25.12": true
+  }
+}

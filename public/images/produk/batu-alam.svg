@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <defs>
+    <filter id="t-batu-alam" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.025" numOctaves="5" seed="11" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="38" xChannelSelector="R" yChannelSelector="G"/>
+      <feColorMatrix in="noise" type="saturate" values="0" result="gray"/>
+      <feBlend in="SourceGraphic" in2="gray" mode="multiply"/>
+    </filter>
+    <radialGradient id="v-batu-alam" cx="35%" cy="25%" r="80%">
+      <stop offset="0%" stop-color="#7c7268"/>
+      <stop offset="100%" stop-color="#a89f93"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#v-batu-alam)"/>
+  <rect width="800" height="600" filter="url(#t-batu-alam)" opacity="0.42"/>
+  <circle cx="400" cy="300" r="150" fill="#ffffff" opacity="0.12"/>
+  <circle cx="400" cy="300" r="150" fill="none" stroke="#ffffff" stroke-width="3" opacity="0.35"/>
+  <text x="400" y="295" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="46" font-weight="700" fill="#ffffff" opacity="0.92">BATU ALAM</text>
+  <text x="400" y="345" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="22" fill="#ffffff" opacity="0.72">RupaDinding</text>
+</svg>

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="1200" height="675">
+  <defs>
+    <linearGradient id="b-pilih" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3b3a35"/>
+      <stop offset="100%" stop-color="#963f21"/>
+    </linearGradient>
+    <filter id="bn-pilih">
+      <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="3" seed="5" result="n"/>
+      <feColorMatrix in="n" type="saturate" values="0"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="675" fill="url(#b-pilih)"/>
+  <rect width="1200" height="675" filter="url(#bn-pilih)" opacity="0.14"/>
+  <circle cx="980" cy="140" r="220" fill="#ffffff" opacity="0.08"/>
+  <circle cx="200" cy="560" r="160" fill="#ffffff" opacity="0.06"/>
+  <text x="80" y="300" font-family="Inter, Arial, sans-serif" font-size="62" font-weight="800" fill="#ffffff">Pilih Jenis Tekstur</text>
+  <text x="80" y="360" font-family="Inter, Arial, sans-serif" font-size="30" fill="#ffffff" opacity="0.85">Kamprot, pasir, stucco, atau batu alam?</text>
+</svg>

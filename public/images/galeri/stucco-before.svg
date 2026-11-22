@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <defs>
+    <linearGradient id="w-stucco-before" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#cfc7ba"/>
+      <stop offset="100%" stop-color="#e8e2d8"/>
+    </linearGradient>
+    <filter id="n-stucco-before">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="3" result="n"/>
+      <feColorMatrix in="n" type="saturate" values="0"/>
+    </filter>
+  </defs>
+  <rect width="800" height="600" fill="url(#w-stucco-before)"/>
+  <rect width="800" height="600" filter="url(#n-stucco-before)" opacity="0.12"/>
+  <rect x="0" y="470" width="800" height="130" fill="#1d1c19" opacity="0.18"/>
+  <path d="M120 90 L200 220 L160 330 L240 470" stroke="#7a736b" stroke-width="4" fill="none" opacity="0.7"/>
+         <path d="M520 60 L600 180 L560 300 L640 460" stroke="#7a736b" stroke-width="3" fill="none" opacity="0.5"/>
+         <path d="M300 40 L360 150 L320 260" stroke="#7a736b" stroke-width="3" fill="none" opacity="0.45"/>
+  <text x="400" y="545" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="26" font-weight="600" fill="#ffffff" opacity="0.85">Sebelum - Stucco</text>
+</svg>
